@@ -10,37 +10,39 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class EmployeeController {
-    private static final Logger LOG = LoggerFactory.getLogger(EmployeeController.class);
 
-    @Autowired
-    private EmployeeService employeeService;
+  private static final Logger LOG = LoggerFactory.getLogger(EmployeeController.class);
 
-    @PostMapping("/employee")
-    public Employee create(@RequestBody Employee employee) {
-        LOG.debug("Received employee create request for [{}]", employee);
+  @Autowired
+  private EmployeeService employeeService;
 
-        return employeeService.create(employee);
-    }
+  @PostMapping("/employee")
+  public Employee create(@RequestBody Employee employee) {
+    LOG.debug("Received employee create request for [{}]", employee);
 
-    @GetMapping("/employee/{id}")
-    public Employee read(@PathVariable String id) {
-        LOG.debug("Received employee create request for id [{}]", id);
+    return employeeService.create(employee);
+  }
 
-        return employeeService.read(id);
-    }
+  @GetMapping("/employee/{id}/reporting")
+  public ReportingStructure getReportingStructure(@PathVariable String id) {
+    LOG.debug("Received get reporting structure request for employee id [{}]", id);
 
-    @PutMapping("/employee/{id}")
-    public Employee update(@PathVariable String id, @RequestBody Employee employee) {
-        LOG.debug("Received employee create request for id [{}] and employee [{}]", id, employee);
+    return employeeService.getReportingStructure(id);
+  }
 
-        employee.setEmployeeId(id);
-        return employeeService.update(employee);
-    }
+  @GetMapping("/employee/{id}")
+  public Employee read(@PathVariable String id) {
+    LOG.debug("Received employee create request for id [{}]", id);
 
-    @GetMapping("/employee/{id}/reporting")
-    public ReportingStructure getReportingStructure(@PathVariable String id) {
-        LOG.debug("Received get reporting structure request for employee id [{}]", id);
+    return employeeService.read(id);
+  }
 
-        return employeeService.getReportingStructure(id);
-    }
+
+  @PutMapping("/employee/{id}")
+  public Employee update(@PathVariable String id, @RequestBody Employee employee) {
+    LOG.debug("Received employee create request for id [{}] and employee [{}]", id, employee);
+
+    employee.setEmployeeId(id);
+    return employeeService.update(employee);
+  }
 }
