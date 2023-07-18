@@ -3,10 +3,14 @@ package com.mindex.challenge.service.impl;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toSet;
 
+import com.mindex.challenge.dao.CompensationRepository;
 import com.mindex.challenge.dao.EmployeeRepository;
+import com.mindex.challenge.data.Compensation;
+import com.mindex.challenge.data.CompensationDataRecord;
 import com.mindex.challenge.data.Employee;
 import com.mindex.challenge.data.ReportingStructure;
 import com.mindex.challenge.service.EmployeeService;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -22,6 +26,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
   @Autowired
   private EmployeeRepository employeeRepository;
+  @Autowired
+  private CompensationRepository compensationRepository;
 
   @Override
   public Employee create(Employee employee) {
@@ -97,5 +103,43 @@ public class EmployeeServiceImpl implements EmployeeService {
     int totalNumberOfReports = getNestedReportsIds(employee).size();
 
     return new ReportingStructure(employee, totalNumberOfReports);
+  }
+
+  private Compensation getCompensationFromData(CompensationDataRecord data) {
+    String employeeId = data.getEmployeeId();
+
+    Employee employee = employeeRepository.findByEmployeeId(employeeId);
+    if (employee == null) {
+      throw new RuntimeException("Invalid employeeId: " + employeeId);
+    }
+
+    return new Compensation(employee, data.getSalaryInCents(), data.getEffectiveDate());
+  }
+
+  @Override
+  public Compensation createCompensation(String id, long salaryInCents,
+      Instant effectiveDate) {
+    LOG.debug("Creating compensation for employee id [{}]", id);
+
+    CompensationDataRecord compensationData = new CompensationDataRecord(id, salaryInCents,
+        effectiveDate);
+    // It is important to get Compensation filled out first to ensure we are able to get an Employee
+    // object for this employee ID (otherwise RuntimeException will occur).
+    Compensation compensation = getCompensationFromData(compensationData);
+    compensationRepository.insert(compensationData);
+
+    return compensation;
+  }
+
+  @Override
+  public Compensation readCompensation(String id) {
+    LOG.debug("Reading compensation for employee id [{}]", id);
+
+    CompensationDataRecord compensationData = compensationRepository.findByEmployeeId(id);
+    if (compensationData == null) {
+      throw new RuntimeException("No compensation information for: " + id);
+    }
+
+    return getCompensationFromData(compensationData);
   }
 }
