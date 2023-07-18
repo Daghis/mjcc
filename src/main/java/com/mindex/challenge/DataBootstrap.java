@@ -29,7 +29,9 @@ public class DataBootstrap {
   // Test data for Compensation tests.
   private static final String JOHN_LENNON_ID = "16a596ae-edd3-4847-99fe-c4518e82c86f";
   private static final long SALARY_IN_CENTS = 123_456_00;
-  private static final Instant EFFECTIVE_DATE = Instant.ofEpochSecond(1689707057);
+
+  // This value corresponds to 2016-07-11T00:00:00Z and is used in tests.
+  private static final Instant EFFECTIVE_DATE = Instant.ofEpochSecond(1468195200);
 
   @PostConstruct
   public void init() {
