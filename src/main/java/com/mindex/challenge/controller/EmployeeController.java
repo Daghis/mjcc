@@ -23,18 +23,18 @@ public class EmployeeController {
     return employeeService.create(employee);
   }
 
-  @GetMapping("/employee/{id}/reporting")
-  public ReportingStructure getReportingStructure(@PathVariable String id) {
-    LOG.debug("Received get reporting structure request for employee id [{}]", id);
-
-    return employeeService.getReportingStructure(id);
-  }
-
   @GetMapping("/employee/{id}")
   public Employee read(@PathVariable String id) {
     LOG.debug("Received employee create request for id [{}]", id);
 
     return employeeService.read(id);
+  }
+
+  @GetMapping("/employee/{id}/reporting")
+  public ReportingStructure getReportingStructure(@PathVariable String id) {
+    LOG.debug("Received get reporting structure request for employee id [{}]", id);
+
+    return employeeService.getReportingStructure(id);
   }
 
 
