@@ -63,7 +63,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     Set<String> nestedReportsIds = new HashSet<>();
 
     if (root.getDirectReports() == null) {
-      return Set.of(root.getEmployeeId());
+      return Set.of();
     }
 
     Set<Employee> employeeReports = root.getDirectReports().stream()
@@ -81,6 +81,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     return nestedReportsIds;
   }
 
+  @Override
   public ReportingStructure getReportingStructure(String id) {
     LOG.debug("Computing reporting structure for employee with id [{}]", id);
 
