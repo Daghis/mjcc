@@ -96,10 +96,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     // addresses potential issues with reports having multiple managers.
     int totalNumberOfReports = getNestedReportsIds(employee).size();
 
-    ReportingStructure reporting = new ReportingStructure();
-    reporting.setEmployee(employee);
-    reporting.setNumberOfReports(totalNumberOfReports);
-
-    return reporting;
+    return new ReportingStructure(employee, totalNumberOfReports);
   }
 }
