@@ -121,14 +121,16 @@ public class EmployeeServiceImpl implements EmployeeService {
       Instant effectiveDate) {
     LOG.debug("Creating compensation for employee id [{}]", id);
 
+    if (compensationRepository.findByEmployeeId(id) != null) {
+      throw new RuntimeException(
+          "Unable to create duplicate compensation record for employee " + id);
+    }
+
     CompensationDataRecord compensationData = new CompensationDataRecord(id, salaryInCents,
         effectiveDate);
-    // It is important to get Compensation filled out first to ensure we are able to get an Employee
-    // object for this employee ID (otherwise RuntimeException will occur).
-    Compensation compensation = getCompensationFromData(compensationData);
     compensationRepository.insert(compensationData);
 
-    return compensation;
+    return getCompensationFromData(compensationData);
   }
 
   @Override

@@ -32,8 +32,9 @@ public class ChallengeApplicationTests {
 
 
   private static final String JOHN_LENNON_ID = "16a596ae-edd3-4847-99fe-c4518e82c86f";
-  private static final String CREATED_COMPENSATION_ID = "b7839309-3348-463b-a7e3-5de1c168beb3";
-  private static final String NO_COMPENSATION_ID = "03aa1462-ffa9-4978-901b-7c001562cf6f";
+  private static final String PAUL_MCCARTNEY_ID = "b7839309-3348-463b-a7e3-5de1c168beb3";
+  private static final String RINGO_STARR_ID = "03aa1462-ffa9-4978-901b-7c001562cf6f";
+  private static final String NO_COMPENSATION_ID = "62c1084e-6e34-4630-93fd-9153afb65309";
   private static final String INVALID_ID = "this id fails";
   private static final long SALARY_IN_CENTS = 123_456_00;
 
@@ -85,9 +86,9 @@ public class ChallengeApplicationTests {
   @Test
   public void getReportingStructure_noReports() {
     ReportingStructure structure = employeeController.getReportingStructure(
-        CREATED_COMPENSATION_ID);
+        PAUL_MCCARTNEY_ID);
 
-    assertEquals(CREATED_COMPENSATION_ID, structure.getEmployee().getEmployeeId());
+    assertEquals(PAUL_MCCARTNEY_ID, structure.getEmployee().getEmployeeId());
     assertEquals(0, structure.getNumberOfReports());
   }
 
@@ -100,19 +101,19 @@ public class ChallengeApplicationTests {
   @Test
   public void createCompensation_basic() {
     long salaryInCents = 12345678;
-    Compensation compensation = employeeController.createCompensation(CREATED_COMPENSATION_ID,
+    Compensation compensation = employeeController.createCompensation(PAUL_MCCARTNEY_ID,
         salaryInCents, EFFECTIVE_DATE_ISO);
 
     // First, validate the returned Compensation object.
-    assertEquals(CREATED_COMPENSATION_ID, compensation.getEmployee().getEmployeeId());
+    assertEquals(PAUL_MCCARTNEY_ID, compensation.getEmployee().getEmployeeId());
     assertEquals(salaryInCents, compensation.getSalaryInCents());
     assertEquals(EFFECTIVE_DATE, compensation.getEffectiveDate());
 
     // Now, check the data that was written to Mongo.
     CompensationDataRecord dataRecord = compensationRepository.findByEmployeeId(
-        CREATED_COMPENSATION_ID);
+        PAUL_MCCARTNEY_ID);
 
-    assertEquals(CREATED_COMPENSATION_ID, dataRecord.getEmployeeId());
+    assertEquals(PAUL_MCCARTNEY_ID, dataRecord.getEmployeeId());
     assertEquals(salaryInCents, dataRecord.getSalaryInCents());
     assertEquals(EFFECTIVE_DATE, dataRecord.getEffectiveDate());
   }
@@ -121,6 +122,14 @@ public class ChallengeApplicationTests {
   public void createCompensation_employeeNotFound() {
     exceptionRule.expect(RuntimeException.class);
     employeeController.createCompensation(INVALID_ID, 12345600, EFFECTIVE_DATE_ISO);
+  }
+
+  @Test
+  public void createCompensation_duplicateRecord() {
+    employeeController.createCompensation(RINGO_STARR_ID, SALARY_IN_CENTS, EFFECTIVE_DATE_ISO);
+
+    exceptionRule.expect(RuntimeException.class);
+    employeeController.createCompensation(RINGO_STARR_ID, SALARY_IN_CENTS, EFFECTIVE_DATE_ISO);
   }
 
   @Test
