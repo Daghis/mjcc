@@ -1,8 +1,11 @@
 package com.mindex.challenge;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mindex.challenge.dao.CompensationRepository;
 import com.mindex.challenge.dao.EmployeeRepository;
+import com.mindex.challenge.data.CompensationDataRecord;
 import com.mindex.challenge.data.Employee;
+import java.time.Instant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -12,28 +15,41 @@ import java.io.InputStream;
 
 @Component
 public class DataBootstrap {
-    private static final String DATASTORE_LOCATION = "/static/employee_database.json";
 
-    @Autowired
-    private EmployeeRepository employeeRepository;
+  private static final String DATASTORE_LOCATION = "/static/employee_database.json";
 
-    @Autowired
-    private ObjectMapper objectMapper;
+  @Autowired
+  private EmployeeRepository employeeRepository;
+  @Autowired
+  private CompensationRepository compensationRepository;
 
-    @PostConstruct
-    public void init() {
-        InputStream inputStream = this.getClass().getResourceAsStream(DATASTORE_LOCATION);
+  @Autowired
+  private ObjectMapper objectMapper;
 
-        Employee[] employees = null;
+  // Test data for Compensation tests.
+  private static final String JOHN_LENNON_ID = "16a596ae-edd3-4847-99fe-c4518e82c86f";
+  private static final long SALARY_IN_CENTS = 123_456_00;
 
-        try {
-            employees = objectMapper.readValue(inputStream, Employee[].class);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+  // This value corresponds to 2016-07-11T00:00:00Z and is used in tests.
+  private static final Instant EFFECTIVE_DATE = Instant.ofEpochSecond(1468195200);
 
-        for (Employee employee : employees) {
-            employeeRepository.insert(employee);
-        }
+  @PostConstruct
+  public void init() {
+    InputStream inputStream = this.getClass().getResourceAsStream(DATASTORE_LOCATION);
+
+    Employee[] employees = null;
+
+    try {
+      employees = objectMapper.readValue(inputStream, Employee[].class);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
+
+    for (Employee employee : employees) {
+      employeeRepository.insert(employee);
+    }
+
+    compensationRepository.insert(new CompensationDataRecord(JOHN_LENNON_ID,
+        SALARY_IN_CENTS, EFFECTIVE_DATE));
+  }
 }
